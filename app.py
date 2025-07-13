@@ -8,6 +8,20 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 
 # Suppress TensorFlow logs
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2"
+import os
+import requests
+
+def download_model():
+    if not os.path.exists("fakenews_lstm_model.h5"):
+        print("Downloading model from Google Drive...")
+        file_id = "https://drive.google.com/file/d/1OeFOjCVDq_MrDUUGyAWqWhfPNrepi8zM/view?usp=sharing"  # replace with your actual file ID
+        url = f"https://drive.google.com/uc?id={file_id}"
+        r = requests.get(url)
+        with open("fakenews_lstm_model.h5", "wb") as f:
+            f.write(r.content)
+        print("Model downloaded.")
+
+download_model()
 
 # === CONFIG ===
 MODEL_PATH = "fakenews_lstm_model.h5"
