@@ -1,45 +1,34 @@
+import os
+import requests
 import numpy as np
 import joblib
 from fastapi import FastAPI
 from pydantic import BaseModel
 from tensorflow.lite.python.interpreter import Interpreter
 from tensorflow.keras.preprocessing.sequence import pad_sequences
-import requests
 
 app = FastAPI()
 
-# Load tokenizer
-tokenizer = joblib.load("tokenizer.pkl")
-maxlen = 40
+# === SETTINGS ===
+MODEL_PATH = "model.tflite"
+TOKENIZER_PATH = "tokenizer.pkl"
+MAXLEN = 40
+GOOGLE_DRIVE_FILE_ID = "YOUR_FILE_ID_HERE"  # 👈 Replace with your actual file ID
 
-# Load TFLite model
-interpreter = Interpreter(model_path="model.tflite")
+# === DOWNLOAD TFLITE MODEL IF NOT PRESENT ===
+def download_tflite_model():
+    if not os.path.exists(MODEL_PATH):
+        print("Downloading model.tflite...")
+        url = f"https://drive.google.com/uc?id={GOOGLE_DRIVE_FILE_ID}"
+        response = requests.get(url)
+        with open(MODEL_PATH, "wb") as f:
+            f.write(response.content)
+        print("Download complete.")
+
+# === SETUP ===
+download_tflite_model()
+tokenizer = joblib.load(TOKENIZER_PATH)
+
+interpreter = Interpreter(model_path=MODEL_PATH)
 interpreter.allocate_tensors()
-
-input_index = interpreter.get_input_details()[0]['index']
-output_index = interpreter.get_output_details()[0]['index']
-
-class NewsRequest(BaseModel):
-    text: str
-
-@app.post("/predict")
-def predict(news: NewsRequest):
-    seq = tokenizer.texts_to_sequences([news.text])
-    padded = pad_sequences(seq, maxlen=maxlen, padding='post')
-
-    # Run model
-    interpreter.set_tensor(input_index, np.array(padded, dtype=np.float32))
-    interpreter.invoke()
-    pred = interpreter.get_tensor(output_index)[0][0]
-
-    label = "Real" if pred >= 0.5 else "Fake"
-    confidence = round(float(pred if label == "Real" else 1 - pred), 2)
-    return {"label": label, "confidence": confidence}
-    
-def download_model():
-    url = "https://your-hosted-link.com/model.tflite"
-    r = requests.get(url)
-    with open("model.tflite", "wb") as f:
-        f.write(r.content)
-
-download_model()
+input_index = interpreter.get
