@@ -9,7 +9,7 @@ COPY . /app
 
 # Install required packages
 RUN pip install fastapi uvicorn joblib pydantic
-
+RUN pip install gdown
 # Expose port
 EXPOSE 8000
 
