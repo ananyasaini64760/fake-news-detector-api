@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from tensorflow.lite.python.interpreter import Interpreter
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+import requests
 
 app = FastAPI()
 
@@ -34,3 +35,11 @@ def predict(news: NewsRequest):
     label = "Real" if pred >= 0.5 else "Fake"
     confidence = round(float(pred if label == "Real" else 1 - pred), 2)
     return {"label": label, "confidence": confidence}
+    
+def download_model():
+    url = "https://your-hosted-link.com/model.tflite"
+    r = requests.get(url)
+    with open("model.tflite", "wb") as f:
+        f.write(r.content)
+
+download_model()
