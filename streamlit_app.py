@@ -11,7 +11,7 @@ st.markdown("Enter a news article and find out if it's **Real** or **Fake** usin
 
 # Text input
 news_text = st.text_area("Paste your news text here:", height=200)
-
+response = requests.post(API_URL, json={"text": news_text})
 # Prediction
 if st.button("Check News"):
     if news_text.strip() == "":
