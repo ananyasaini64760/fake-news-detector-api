@@ -1,5 +1,0 @@
-fastapi
-uvicorn
-tflite-runtime==2.5.0
-joblib
-pydantic
