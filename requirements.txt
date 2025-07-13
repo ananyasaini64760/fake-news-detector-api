@@ -1,5 +1,5 @@
 fastapi
 uvicorn
-tensorflow
+tensorflow-cpu==2.11.0
 joblib
 pydantic
